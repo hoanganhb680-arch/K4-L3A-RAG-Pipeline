@@ -63,7 +63,7 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     if not CORPUS:
         return []
         
-    if BM25_INDEX is None:
+    if BM25_INDEX is None or getattr(BM25_INDEX, "corpus_size", -1) != len(CORPUS):
         BM25_INDEX = build_bm25_index(CORPUS)
         
     if BM25_INDEX is None:
@@ -79,7 +79,11 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     results = []
     for index in indices:
         if scores[index] <= 0:
-            continue
+            # BM25Okapi can return 0.0 or negative scores for valid matches in very small corpora
+            # Ensure we only skip if the document genuinely doesn't contain any query terms
+            content_lower = CORPUS[index]["content"].lower()
+            if not any(term in content_lower for term in tokenized_query):
+                continue
             
         item = CORPUS[index]
         results.append({
