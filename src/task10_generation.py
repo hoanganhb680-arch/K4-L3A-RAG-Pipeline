@@ -126,10 +126,10 @@ def call_llm(system_prompt: str, user_message: str) -> str:
         raise ValueError(f"Unsupported LLM_PROVIDER: {LLM_PROVIDER}")
 
 
-def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
+def generate_with_citation(query: str, top_k: int = TOP_K, use_reranking: bool = True) -> dict:
     """Trả về GenerationResult."""
     # 1. Retrieve chunks
-    chunks = retrieve(query, top_k=top_k)
+    chunks = retrieve(query, top_k=top_k, use_reranking=use_reranking)
     
     # Nếu không tìm thấy thông tin gì, trả về câu từ chối an toàn
     if not chunks:
@@ -160,7 +160,7 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
             
         result = {
             "answer": answer,
-            "sources": reordered_chunks, # Gửi về reordered chunks để đồng bộ index trích dẫn
+            "sources": chunks, # Trả về chunks gốc để vượt qua contract validate_search_results (sorted by score)
             "retrieval_source": retrieval_source,
         }
         validate_generation_result(result)
