@@ -1,13 +1,13 @@
-"""Task 9 ? Retrieval pipeline ho?n ch?nh.
+"""Task 9 - Retrieval pipeline hoàn chỉnh.
 
-Lu?ng x? l?:
-    1. Ch?y semantic_search v? lexical_search.
-    2. Fuse hai danh s?ch b?ng RRF ??ng m?t l?n.
-    3. L?y best cosine score g?c t? dense results.
-    4. N?u score d??i threshold, th? PageIndex fallback.
-    5. N?u fallback l?i, tr? hybrid results thay v? crash.
+Luồng xử lý:
+    1. Chạy semantic_search và lexical_search.
+    2. Fuse hai danh sách bằng RRF đúng một lần.
+    3. Lấy best cosine score gốc từ dense results.
+    4. Nếu score dưới threshold, thử PageIndex fallback.
+    5. Nếu fallback lỗi, trả hybrid results thay vì crash.
 
-Kh?ng so s?nh threshold v?i RRF score v? hai thang ?o kh?c nhau.
+Không so sánh threshold với RRF score vì hai thang đo khác nhau.
 """
 
 from .task5_semantic_search import semantic_search
@@ -25,7 +25,7 @@ def retrieve(
     score_threshold: float = SCORE_THRESHOLD,
     use_reranking: bool = True,
 ) -> list[dict]:
-    """Tr? v? hybrid ho?c pageindex SearchResult."""
+    """Trả về hybrid hoặc pageindex SearchResult."""
     dense = semantic_search(query, top_k=top_k * 2)
     sparse = lexical_search(query, top_k=top_k * 2)
 
@@ -42,17 +42,17 @@ def retrieve(
             if fallback:
                 return fallback
         except Exception:
-            # PageIndex/provider l?i ???c quy ??nh ph?i survivable.
+            # PageIndex/provider lỗi được quy định phải survivable.
             pass
 
     if not hybrid and dense:
-        # RRF c? th? kh?ng tr? k?t qu? n?u c? hai nh?nh r?ng; tuy nhi?n n?u
-        # dense c? k?t qu? nh?ng fusion r?ng th? gi? dense ?? pipeline ?n ??nh.
+        # RRF có thể không trả kết quả nếu cả hai nhánh rỗng; tuy nhiên nếu
+        # dense có kết quả nhưng fusion rỗng thì giữ dense để pipeline ổn định.
         return dense[:top_k]
 
     return hybrid[:top_k]
 
 
 if __name__ == "__main__":
-    for result in retrieve("V?nh H? Long", top_k=3):
+    for result in retrieve("Vịnh Hạ Long", top_k=3):
         print(result["score"], result["metadata"]["title"])

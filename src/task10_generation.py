@@ -1,13 +1,13 @@
-"""Task 10 ? Generation c? citation.
+"""Task 10 - Generation có citation.
 
-H??ng d?n:
+Hướng dẫn:
     1. Retrieve top-k chunks.
-    2. Reorder ?? gi?m lost-in-the-middle.
-    3. Format context k?m title v? source.
-    4. G?i provider ???c ch?n trong .env.
-    5. Tr? answer, sources v? retrieval_source.
+    2. Reorder để giảm lost-in-the-middle.
+    3. Format context kèm title và source.
+    4. Gọi provider được chọn trong .env.
+    5. Trả answer, sources và retrieval_source.
 
-N?u context kh?ng ?? ho?c provider l?i, tr? safe refusal; kh?ng b?a th?ng tin.
+Nếu context không đủ hoặc provider lỗi, trả safe refusal; không bịa thông tin.
 """
 
 import os
@@ -26,16 +26,18 @@ TEMPERATURE = 0.3
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").strip().lower()
 LLM_MODEL = os.getenv("LLM_MODEL", "").strip() or (
-    "gemini-2.0-flash" if LLM_PROVIDER == "gemini" else ""
+    "gemini-3.6-flash" if LLM_PROVIDER == "gemini" else ""
 )
 
-SYSTEM_PROMPT = """B?n l? tr? l? tr? l?i t? ngu?n t?i li?u ???c cung c?p.
-Ch? d?ng CONTEXT. M?i kh?ng ??nh ph?i c? citation [Document X].
-N?u CONTEXT kh?ng ?? th?ng tin, h?y t? ch?i x?c minh v? kh?ng b?a th?ng tin."""
+SAFE_REFUSAL = "Tôi không thể xác minh thông tin này từ nguồn hiện có."
+
+SYSTEM_PROMPT = """Bạn là trợ lý trả lời từ nguồn tài liệu được cung cấp.
+Chỉ dùng CONTEXT. Mỗi khẳng định quan trọng phải có citation [Document X].
+Nếu CONTEXT không đủ thông tin, hãy từ chối xác minh và không bịa thông tin."""
 
 
 def reorder_for_llm(chunks: list[dict]) -> list[dict]:
-    """??a chunks quan tr?ng v? ??u v? cu?i context."""
+    """Đưa chunks quan trọng về đầu và cuối context."""
     if len(chunks) <= 2:
         return list(chunks)
     front = chunks[::2]
@@ -44,7 +46,7 @@ def reorder_for_llm(chunks: list[dict]) -> list[dict]:
 
 
 def format_context(chunks: list[dict]) -> str:
-    """T?o context c? title v? source label."""
+    """Tạo context có title và source label."""
     parts = []
     for index, chunk in enumerate(chunks, 1):
         metadata = chunk.get("metadata", {})
@@ -57,7 +59,7 @@ def format_context(chunks: list[dict]) -> str:
 
 
 def call_llm(system_prompt: str, user_message: str) -> str:
-    """G?i OpenAI, Gemini ho?c Anthropic theo c?u h?nh."""
+    """Gọi OpenAI, Gemini hoặc Anthropic theo cấu hình."""
     if LLM_PROVIDER == "openai":
         from openai import OpenAI
 
@@ -79,7 +81,7 @@ def call_llm(system_prompt: str, user_message: str) -> str:
         from google.genai import types as genai_types
 
         client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-        model_name = os.getenv("LLM_MODEL") or "gemini-2.0-flash"
+        model_name = os.getenv("LLM_MODEL") or "gemini-3.6-flash"
         config = genai_types.GenerateContentConfig(
             temperature=TEMPERATURE,
             top_p=TOP_P,
@@ -111,11 +113,11 @@ def call_llm(system_prompt: str, user_message: str) -> str:
 
 
 def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
-    """Tr? v? GenerationResult."""
+    """Trả về GenerationResult."""
     chunks = retrieve(query, top_k=top_k)
     if not chunks:
         result = {
-            "answer": "T?i kh?ng th? x?c minh th?ng tin n?y t? ngu?n hi?n c?.",
+            "answer": SAFE_REFUSAL,
             "sources": [],
             "retrieval_source": "none",
         }
@@ -136,19 +138,19 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
         print(f"LLM error: {type(error).__name__}: {error}")
         sources = sorted(reordered, key=lambda item: item.get("score", 0.0), reverse=True)
         result = {
-            "answer": "T?i kh?ng th? x?c minh th?ng tin n?y t? ngu?n hi?n c?.",
+            "answer": SAFE_REFUSAL,
             "sources": sources,
             "retrieval_source": retrieval_source,
         }
         validate_generation_result(result)
         return result
 
-    # Context ?? ???c reorder ?? gi?m lost-in-the-middle. Ri?ng `sources`
-    # ph?i ???c s?p theo score gi?m d?n theo SearchResult contract.
+    # Context đã được reorder để giảm lost-in-the-middle. Riêng `sources`
+    # phải được sắp theo score giảm dần theo SearchResult contract.
     sources = sorted(reordered, key=lambda item: item.get("score", 0.0), reverse=True)
 
     result = {
-        "answer": answer or "T?i kh?ng th? x?c minh th?ng tin n?y t? ngu?n hi?n c?.",
+        "answer": answer or SAFE_REFUSAL,
         "sources": sources,
         "retrieval_source": retrieval_source,
     }
@@ -157,7 +159,7 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
 
 
 if __name__ == "__main__":
-    result = generate_with_citation("Quy ??nh visa Vi?t Nam c? th?i h?n bao l?u?", top_k=3)
+    result = generate_with_citation("Quy định visa Việt Nam có thời hạn bao lâu?", top_k=3)
     print(result["retrieval_source"])
     print(result["answer"])
     print("sources:", len(result["sources"]))

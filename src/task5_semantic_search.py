@@ -1,20 +1,20 @@
-"""Task 5 ? Semantic search.
+"""Task 5 - Semantic search.
 
-Embed query b?ng ch?nh h?m c?a Task 4, query ChromaDB v? ??i cosine distance
-th?nh similarity. Output ph?i theo SearchResult, sort gi?m d?n v? kh?ng qu? top_k.
+Embed query bằng chính hàm của Task 4, query ChromaDB và đổi cosine distance
+thành similarity. Output phải theo SearchResult, sort giảm dần và không quá top_k.
 """
 
 from .task4_chunking_indexing import embed_texts, get_collection
 
 
 def semantic_search(query: str, top_k: int = 10) -> list[dict]:
-    """Tr? v? dense SearchResult theo score gi?m d?n."""
+    """Trả về dense SearchResult theo score giảm dần."""
     if top_k <= 0:
         return []
 
     collection = get_collection()
 
-    # H? tr? fake collection trong contract test (kh?ng c? .count()).
+    # Hỗ trợ fake collection trong contract test (không có .count()).
     try:
         count = int(getattr(collection, "count")())
     except Exception:
@@ -54,5 +54,5 @@ def semantic_search(query: str, top_k: int = 10) -> list[dict]:
 
 
 if __name__ == "__main__":
-    for result in semantic_search("V?nh H? Long", top_k=3):
+    for result in semantic_search("Vịnh Hạ Long", top_k=3):
         print(result["score"], result["metadata"]["title"])
