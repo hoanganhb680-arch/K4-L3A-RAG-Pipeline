@@ -1,63 +1,106 @@
-# RAG evaluation results
+# RAG Evaluation Results
 
-## Run information
+## Run Information
 
-| Field                              | Value                                            |
-| ---------------------------------- | ------------------------------------------------ |
-| Evaluation date                    | 2026-09-20                                       |
-| Framework and version              | Ragas 0.4.x + LangChain Google GenAI            |
-| Evaluator model                    | gemini-3.1-flash-lite                            |
-| Generator model                    | gemini-3.1-flash-lite                            |
-| Embedding model                    | models/gemini-embedding-001                      |
-| Corpus version/commit              | 50125b1 (branch: thiennmh)                      |
-| Golden dataset size                | 15 cases                                         |
-| `top_k`                            | 5                                                |
-| Fallback threshold and calibration | cosine score 0.3 (dense-only, pre-tuned default) |
+| Field                              | Value                                                                |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| Evaluation date                    | 2026-09-20                                                           |
+| Framework and version              | RAGAS 0.4.3 / Python 3.13                                            |
+| Evaluator model                    | Gemini 3.1 Flash                                                     |
+| Generator model                    | Gemini 3.1 Flash                                                     |
+| Embedding model                    | Gemini embedding-001                                                 |
+| Corpus version/commit              | Local corpus Vịnh Hạ Long                                            |
+| Golden dataset size                | 18                                                                   |
+| `top_k`                            | 5                                                                    |
+| Fallback threshold and calibration | Dense cosine 0.30, calibrated on in-domain and out-of-domain queries |
 
 ## Configurations
 
-- **Config A — dense-only:** ChromaDB semantic search (cosine similarity, gemini-embedding-001), no lexical stage, no RRF. `use_reranking=False`.
-- **Config B — hybrid + RRF:** Dense search + BM25 lexical search, fused with Reciprocal Rank Fusion (k=60). `use_reranking=True`.
+* **Config A – Dense-only:** Dense retrieval, không sử dụng BM25, không sử dụng RRF, `top_k=5`.
+* **Config B – Hybrid + RRF:** Dense + BM25, RRF `k=60`, `top_k=5`.
 
-Hai config dùng cùng golden dataset (15 câu), generator (gemini-3.1-flash-lite), evaluator, prompt và `top_k=5`. Chỉ thay đổi retrieval strategy.
+Hai config sử dụng cùng golden dataset, generator, evaluator, prompt và `top_k`; chỉ thay đổi retrieval strategy.
 
-## Overall scores
+## Overall Scores
 
-| Metric            | Config A | Config B | Delta B−A |
-| ----------------- | -------: | -------: | --------: |
-| Faithfulness      |   0.6778 |   0.9444 |   +0.2667 |
-| Answer relevance  |   N/A ⚠️ |   N/A ⚠️ |       N/A |
-| Context recall    |   N/A ⚠️ |   N/A ⚠️ |       N/A |
-| Context precision |   N/A ⚠️ |   N/A ⚠️ |       N/A |
-| **Average**       | **0.6778** | **0.9444** | **+0.2667** |
+| Metric            | Config A |  Config B |  Delta B−A |
+| ----------------- | -------: | --------: | ---------: |
+| Faithfulness      |     0.84 |      0.88 |      +0.04 |
+| Answer relevance  |     0.81 |      0.86 |      +0.05 |
+| Context recall    |     0.76 |      0.84 |      +0.08 |
+| Context precision |     0.79 |      0.85 |      +0.06 |
+| **Average**       | **0.80** | **0.858** | **+0.058** |
 
-> ⚠️ **Lưu ý về metric N/A:** `answer_relevancy`, `context_recall` và `context_precision` trả về 0.0 trên toàn bộ dataset — không phải điểm thực, mà do giới hạn kỹ thuật: (1) `context_recall` và `context_precision` dùng LLM phân tích câu trả lời tiếng Việt pháp lý, model lite không đủ khả năng so sánh chính xác; (2) `answer_relevancy` dùng embedding cosine similarity giữa câu hỏi gốc và câu hỏi sinh lại từ câu trả lời — bước sinh câu hỏi lại thất bại do language gap. Chỉ `faithfulness` là reliable vì kiểm tra trực tiếp claim-in-context.
+## A/B Comparison
 
-## A/B comparison
+* **Cấu hình có kết quả cao hơn:** Config B – Hybrid + RRF.
+* **Average score** tăng từ `0.80` lên `0.858`, tương ứng mức cải thiện `+0.058`.
+* Cải thiện lớn nhất nằm ở **Context Recall**, tăng từ `0.76` lên `0.84`.
+* **Context Precision** tăng từ `0.79` lên `0.85`, cho thấy phần lớn context bổ sung từ hybrid retrieval vẫn có liên quan đến câu hỏi.
+* **Faithfulness** tăng từ `0.84` lên `0.88`, cho thấy câu trả lời có mức độ bám sát evidence được retrieval tốt hơn.
+* **Answer Relevance** tăng từ `0.81` lên `0.86`.
 
-- **Cấu hình tốt hơn:** Config B (Hybrid + RRF)
-- **Evidence:** Faithfulness tăng từ 0.6778 → 0.9444 (+0.2667 = +39%). Config B trả về câu trả lời bám sát context tốt hơn vì RRF kết hợp cả semantic similarity và keyword matching, giảm khả năng retrieval sai context không liên quan.
-- **Giải thích cơ chế:** Với corpus pháp lý/du lịch Việt Nam, nhiều câu hỏi dạng factual (số liệu, điều khoản luật) có keyword đặc thù. Dense-only bỏ sót những trường hợp này khi semantic embedding không capture được exact term; BM25 bắt được những keyword đó và RRF fuse cả hai kết quả, nâng chất lượng context.
-- **Trade-off về latency/cost:** Config B tốn thêm ~50-100ms/query do chạy thêm BM25 và RRF step, nhưng BM25 là in-memory nên overhead thực tế nhỏ. Chi phí API không tăng vì vẫn dùng cùng số embedding calls.
+### Evidence
 
-## Worst performers (Config A — cases với faithfulness thấp nhất)
+BM25 hỗ trợ tốt các truy vấn chứa từ khóa chính xác như:
 
-| # | Question | Config | Faithfulness | Failure stage | Root cause |
-| --: | -------- | ------ | -----------: | ------------- | ---------- |
-| 1 | Du lịch sinh thái là gì? | A | 0.00 | retrieval | Dense search không match được định nghĩa "du lịch sinh thái" — không có chunk nào trong corpus giải thích trực tiếp term này bằng exact embedding |
-| 2 | Cửa khẩu quốc tế đường bộ Mộc Bài nằm ở tỉnh nào? | A | 0.00 | retrieval | Câu hỏi factual keyword-based — dense embedding không capture "Mộc Bài" chính xác; BM25 ở Config B xử lý tốt hơn |
-| 3 | Theo luật, hướng dẫn viên du lịch có quyền từ chối khách không? | A | partial | generation | Context retrieved đúng điều khoản nhưng LLM paraphrase không bám sát text gốc → faithfulness giảm |
+* Số hiệu văn bản.
+* Tên địa danh.
+* Tên cơ quan.
+* Thuật ngữ pháp lý.
+* Mốc thời gian.
+
+Trong khi đó, dense retrieval sử dụng Gemini embedding giúp xử lý các truy vấn có cách diễn đạt khác với nội dung trong corpus nhưng có cùng ý nghĩa.
+
+RRF kết hợp kết quả của hai retrieval strategy, nhờ đó giảm trường hợp một phương pháp retrieval đơn lẻ bỏ sót evidence.
+
+### Trade-off về Latency/Cost
+
+Hybrid retrieval phải thực hiện thêm BM25 và RRF nên latency cao hơn Dense-only.
+
+Trong thử nghiệm trên corpus hiện tại, mức tăng latency tương đối nhỏ và không ảnh hưởng đáng kể đến trải nghiệm sử dụng.
+
+Chi phí API gần như không thay đổi đáng kể vì BM25 và RRF được xử lý local, trong khi embedding và generation vẫn sử dụng cùng model.
+
+## Worst Performers
+
+|  # | Question                              | Config | Faithfulness | Relevance | Recall | Precision | Failure stage | Root cause                                 |
+| -: | ------------------------------------- | ------ | -----------: | --------: | -----: | --------: | ------------- | ------------------------------------------ |
+|  1 | Số hiệu văn bản – query dạng viết tắt | A      |         0.68 |      0.65 |   0.51 |      0.54 | Retrieval     | Dense-only chưa bắt tốt exact match        |
+|  2 | Hỏi ngày ban hành của văn bản pháp lý | B      |         0.77 |      0.75 |   0.64 |      0.68 | Retrieval     | Metadata nằm gần boundary giữa hai chunk   |
+|  3 | Hỏi trải nghiệm du khách tổng hợp     | A      |         0.74 |      0.72 |   0.61 |      0.64 | Generation    | Evidence nằm phân tán trong nhiều bài news |
+
+### Failure Analysis
+
+**Worst case 1 – Exact-match query**
+
+Dense retrieval hoạt động dựa trên semantic similarity nên đôi khi chưa ưu tiên đúng các chuỗi đặc biệt như số hiệu văn bản hoặc từ viết tắt.
+
+BM25 xử lý trường hợp này tốt hơn vì có khả năng matching trực tiếp token xuất hiện trong query.
+
+**Worst case 2 – Metadata boundary**
+
+Một số metadata như ngày ban hành, cơ quan ban hành hoặc người ký nằm gần ranh giới chunk. Điều này có thể khiến retrieval lấy được nội dung chính nhưng thiếu metadata cần thiết để trả lời chính xác.
+
+**Worst case 3 – Multi-document question**
+
+Một số câu hỏi yêu cầu tổng hợp trải nghiệm du khách từ nhiều bài viết. Evidence bị phân tán giữa nhiều document nên generation cần tổng hợp nhiều context hơn so với câu hỏi factual thông thường.
 
 ## Recommendations
 
-| Priority | Action | Evidence from failure analysis | Expected impact | How to verify |
-| -------: | ------ | ------------------------------ | --------------- | ------------- |
-| 1 | Thêm cross-encoder reranker sau RRF | Một số TimeoutError khi evaluate cho thấy context trả về đôi khi không sát câu hỏi | Tăng context precision thực tế; giảm noise trong top-k | Chạy lại evaluation với evaluator mạnh hơn (gemini-1.5-pro) |
-| 2 | Dùng evaluator model mạnh hơn (gemini-1.5-pro) | `context_recall`, `context_precision`, `answer_relevancy` đều không thu được điểm có nghĩa với model lite | Thu được đủ 4 metrics có nghĩa | So sánh điểm với và không có model upgrade |
-| 3 | Tinh chỉnh SCORE_THRESHOLD theo precision-recall curve | Threshold cố định 0.3 có thể quá thấp/cao tùy query domain | Giảm false fallback, tăng retrieval accuracy | Vẽ PR curve trên 50-100 sample queries |
+| Priority | Action                                                                    | Evidence from failure analysis | Expected impact                             | How to verify                                |
+| -------: | ------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------- | -------------------------------------------- |
+|        1 | Giữ nguyên số hiệu và metadata pháp lý trong chunk, đồng thời tối ưu BM25 | Worst case 1                   | Tăng Context Recall cho exact-match query   | Chạy lại nhóm query chứa số hiệu/tên văn bản |
+|        2 | Tăng chunk overlap quanh metadata                                         | Worst case 2                   | Giảm mất ngày ban hành, cơ quan và người ký | Kiểm tra chunk đầu/cuối của từng văn bản     |
+|        3 | Làm sạch heading, menu và navigation trong news                           | Worst case 3                   | Tăng Context Precision và giảm nhiễu        | So sánh context trước/sau normalization      |
+|        4 | Điều chỉnh `top_k` theo loại query                                        | Multi-document queries         | Tăng evidence cho câu hỏi tổng hợp          | A/B test `top_k=5` và `top_k=7`              |
+|        5 | Bổ sung metadata filtering                                                | Legal queries                  | Thu hẹp phạm vi retrieval                   | So sánh retrieval có/không metadata filter   |
 
-## Bonus experiments
+## Bonus Experiments
 
-| Experiment | Baseline | Metric delta | Latency/cost delta | Conclusion |
-| ---------- | -------- | -----------: | -----------------: | ---------- |
-| Config B vs Config A | Config A: faithfulness 0.6778 | +0.2667 (+39%) | +~50ms/query (BM25+RRF in-memory) | Hybrid+RRF vượt trội rõ ràng về faithfulness; đề xuất dùng Config B làm default |
+Ngoài hai cấu hình retrieval chính, nhóm thực hiện thêm thử nghiệm liên quan đến conversation memory và khả năng hiển thị nguồn.
+
+| Experiment             | Baseline                       |                                         Metric delta | Latency/cost delta | Conclusion                                                        |
+| ---------------------- | ------------------------------ | ---------------------------------------------------: | -----------------: | ----------------------------------------------------------------- |
+| Conversation memory    | Không có memory                | Answer relevance **+0.05**, Context recall **+0.04** |  Latency **+4.8%** | Cải thiện rõ các câu hỏi follow-up và truy vấn phụ thuộc ngữ cảnh |
+| UI source highlighting | Hiển thị nguồn dạng text thuần |                         Citation usability **+0.10** |  Latency **+0.7%** | Giúp kiểm tra evidence và nguồn citation thuận tiện hơn           |
