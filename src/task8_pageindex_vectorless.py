@@ -1,12 +1,12 @@
-"""Task 8 ? PageIndex vectorless fallback.
+"""Task 8 - PageIndex vectorless fallback.
 
-H??ng d?n:
-    1. ??c PAGEINDEX_API_KEY t? .env.
-    2. Upload t?i li?u ? ??nh d?ng PageIndex h? tr?.
-    3. Cache document IDs ?? kh?ng upload l?i.
-    4. Parse k?t qu? th?nh SearchResult c? method pageindex.
+Hướng dẫn:
+    1. Đọc PAGEINDEX_API_KEY từ .env.
+    2. Upload tài liệu ở định dạng PageIndex hỗ trợ.
+    3. Cache document IDs để không upload lại.
+    4. Parse kết quả thành SearchResult có method pageindex.
 
-PageIndex l? d?ch v? ngo?i: c?n timeout v? x? l? l?i ?? pipeline kh?ng crash.
+PageIndex là dịch vụ ngoài: cần timeout và xử lý lỗi để pipeline không crash.
 """
 
 import os
@@ -23,10 +23,10 @@ _UPLOADED_IDS: set[str] = set()
 
 
 def upload_documents() -> None:
-    """Upload t?i li?u v? l?u document IDs ?? t?i s? d?ng.
+    """Upload tài liệu và lưu document IDs để tái sử dụng.
 
-    Khi ch?a c? PAGEINDEX_API_KEY, h?m kh?ng crash; fallback s? ???c
-    pipeline x? l? nh? provider kh?ng kh? d?ng.
+    Khi chưa có PAGEINDEX_API_KEY, hàm không crash; fallback sẽ được
+    pipeline xử lý như provider không khả dụng.
     """
     if not PAGEINDEX_API_KEY:
         print("PageIndex API key is not configured; skipped upload.")
@@ -42,10 +42,10 @@ def upload_documents() -> None:
 
 
 def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
-    """Tr? v? pageindex SearchResult.
+    """Trả về pageindex SearchResult.
 
-    Ch?a c? API key ho?c SDK th? tr? danh s?ch r?ng ?? Task 9 chuy?n sang
-    safe fallback/hybrid thay v? l?m pipeline crash.
+    Chưa có API key hoặc SDK thì trả danh sách rỗng để Task 9 chuyển sang
+    safe fallback/hybrid thay vì làm pipeline crash.
     """
     if not PAGEINDEX_API_KEY:
         return []
@@ -55,7 +55,7 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
     except Exception:
         return []
 
-    # Ch?a tri?n khai endpoint search do PageIndex kh?ng ???c c?u h?nh.
+    # Chưa triển khai endpoint search do PageIndex không được cấu hình.
     return []
 
 

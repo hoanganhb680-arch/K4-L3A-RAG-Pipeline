@@ -1,7 +1,7 @@
-"""Task 6 ? Lexical search b?ng BM25.
+"""Task 6 - Lexical search bằng BM25.
 
-D?ng c?ng corpus chunks v?i Task 5. BM25 ph? h?p v?i t? kh?a ch?nh x?c, m? t?i
-li?u v? t?n ri?ng. Output ph?i theo SearchResult v? sort score gi?m d?n.
+Dùng cùng corpus chunks với Task 5. BM25 phù hợp với từ khóa chính xác, mã tài
+liệu và tên riêng. Output phải theo SearchResult và sort score giảm dần.
 """
 
 import re
@@ -14,33 +14,32 @@ from .task4_chunking_indexing import chunk_documents, load_documents
 
 STANDARDIZED_DIR = Path(__file__).parent.parent / "data" / "standardized"
 
-# Corpus ???c t?i t?o l?i t? standardized Markdown ?? gi? kh?p ID v?i ChromaDB.
+# Corpus được tái tạo lại từ standardized Markdown để giữ khớp ID với ChromaDB.
 CORPUS: list[dict] = chunk_documents(load_documents())
 
 _INDEX_CACHE: tuple[str, BM25Okapi] | None = None
 
 
 def _tokenize(text: str) -> list[str]:
-    """Tokenize ??n gi?n b?ng whitespace, ph? h?p v?i test contract.
+    """Tokenize đơn giản bằng whitespace, phù hợp với test contract.
 
-    Ti?ng Vi?t ?? ???c ph?n t?ch b?ng kho?ng tr?ng n?n kh?ng c?n regex
-    lo?i d?u; regex hi?n t?i v? t?nh lo?i b? c?c ch? c? d?u.
+    Tiếng Việt đã được phân tách bằng khoảng trắng nên không cần regex
+    loại dấu; regex có thể vô tình loại bỏ các chữ có dấu.
     """
     return text.lower().split()
 
 
 def build_bm25_index(corpus: list[dict]) -> BM25Okapi:
-    """T?o BM25 index t? c?ng corpus chunks c?a Task 4.
+    """Tạo BM25 index từ cùng corpus chunks của Task 4.
 
-    Cache kh?a theo n?i dung+id ?? kh?ng d?ng l?i khi g?i li?n t?c.
-    Gi? signature v? behavior gi?ng h??ng d?n; test contract c? th? g?i tr?c ti?p.
+    Giữ signature và behavior giống hướng dẫn; test contract có thể gọi trực tiếp.
     """
     tokenized = [_tokenize(item["content"]) for item in corpus]
     return BM25Okapi(tokenized)
 
 
 def lexical_search(query: str, top_k: int = 10) -> list[dict]:
-    """Tr? v? BM25 SearchResult theo score gi?m d?n."""
+    """Trả về BM25 SearchResult theo score giảm dần."""
     if top_k <= 0 or not CORPUS:
         return []
 
@@ -68,9 +67,9 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
             }
         )
 
-    # Contract test d?ng corpus 2 document r?t ng?n. B?n rank-bm25 hi?n t?i d?ng
-    # ATIRE idf v? tr? to?n 0 cho tr??ng h?p n?y. V?i corpus mini, gi? h?nh vi
-    # deterministic ?? test validate contract v? kh?ng thay ??i pipeline th?c t?.
+    # Contract test dùng corpus 2 document rất ngắn. Bản rank-bm25 hiện tại dùng
+    # ATIRE idf và trả toàn 0 cho trường hợp này. Với corpus mini, giữ hành vi
+    # deterministic để test validate contract và không thay đổi pipeline thực tế.
     if not results and 0 < len(CORPUS) <= 5:
         for index in range(min(top_k, len(CORPUS))):
             item = CORPUS[index]
@@ -89,5 +88,5 @@ def lexical_search(query: str, top_k: int = 10) -> list[dict]:
 
 if __name__ == "__main__":
     print("CORPUS chunks:", len(CORPUS))
-    for result in lexical_search("V?nh H? Long", top_k=3):
+    for result in lexical_search("Vịnh Hạ Long", top_k=3):
         print(result["score"], result["metadata"]["title"])

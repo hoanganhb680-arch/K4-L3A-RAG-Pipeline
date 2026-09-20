@@ -1,9 +1,9 @@
-"""Task 7 ? Reciprocal Rank Fusion.
+"""Task 7 - Reciprocal Rank Fusion.
 
-RRF g?p nhi?u b?ng x?p h?ng m? kh?ng c?ng tr?c ti?p cosine score v?i BM25
-score. C?ng th?c: RRF(d) = sum(1 / (k + rank)), rank b?t ??u t? 1.
+RRF gộp nhiều bảng xếp hạng mà không cộng trực tiếp cosine score với BM25
+score. Công thức: RRF(d) = sum(1 / (k + rank)), rank bắt đầu từ 1.
 
-L?u ?: RRF score ch? ph?n ?nh th? h?ng, kh?ng d?ng ?? quy?t ??nh fallback.
+Lưu ý: RRF score chỉ phản ánh thứ hạng, không dùng để quyết định fallback.
 """
 
 
@@ -12,7 +12,7 @@ def rerank_rrf(
     top_k: int = 5,
     k: int = 60,
 ) -> list[dict]:
-    """Fuse nhi?u ranked lists v? tr? hybrid SearchResult."""
+    """Fuse nhiều ranked lists và trả hybrid SearchResult."""
     scores: dict[str, float] = {}
     items: dict[str, dict] = {}
 
@@ -20,7 +20,7 @@ def rerank_rrf(
         for rank, item in enumerate(ranked_list, 1):
             item_id = item["id"]
             scores[item_id] = scores.get(item_id, 0.0) + 1.0 / float(k + rank)
-            # L?y ph?n t? c? rank t?t nh?t; kh?ng quan tr?ng th? t? ngu?n ? ??y.
+            # Lấy phần tử có rank tốt nhất; không quan trọng thứ tự nguồn ở đây.
             if item_id not in items:
                 items[item_id] = item
 
