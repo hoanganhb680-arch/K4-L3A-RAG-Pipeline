@@ -1,0 +1,77 @@
+[
+  {
+    "question": "Visa điện tử (E-visa) của Việt Nam có thời hạn bao lâu?",
+    "expected_answer": "Visa điện tử Việt Nam có thời hạn 90 ngày và có thể nhập cảnh một hoặc nhiều lần.",
+    "expected_context": "Visa điện tử (E-visa): Thời hạn 90 ngày (một lần hoặc nhiều lần nhập cảnh)."
+  },
+  {
+    "question": "Phí đăng ký E-visa Việt Nam là bao nhiêu?",
+    "expected_answer": "Phí đăng ký Visa điện tử là 25 USD.",
+    "expected_context": "Phí: 25 USD. Xử lý: 3 ngày làm việc."
+  },
+  {
+    "question": "Công dân của quốc gia nào được miễn thị thực đơn phương 15 ngày?",
+    "expected_answer": "Đức, Pháp, Ý, Tây Ban Nha, Anh, Nga, Nhật, Hàn Quốc, Đan Mạch, Thụy Điển, Na Uy, Phần Lan, Belarus, Kazakhstan, Kyrgyzstan.",
+    "expected_context": "15 ngày: Đức, Pháp, Ý, Tây Ban Nha, Anh, Nga, Nhật, Hàn Quốc, Đan Mạch, Thụy Điển, Na Uy, Phần Lan, Belarus, Kazakhstan, Kyrgyzstan."
+  },
+  {
+    "question": "Khi nhập cảnh Việt Nam, tôi mang bao nhiêu ngoại tệ thì phải khai báo hải quan?",
+    "expected_answer": "Bạn phải khai báo hải quan nếu mang trên 5.000 USD tiền mặt hoặc 15 triệu VND.",
+    "expected_context": "Khi nhập cảnh mang tiền mặt trên 5.000 USD hoặc 15 triệu VND phải khai báo hải quan."
+  },
+  {
+    "question": "Luật Du lịch 2017 định nghĩa thế nào là du lịch?",
+    "expected_answer": "Du lịch là các hoạt động có liên quan đến chuyến đi của con người ngoài nơi cư trú thường xuyên trong thời gian không quá 01 năm liên tục nhằm đáp ứng nhu cầu tham quan, nghỉ dưỡng, giải trí, tìm hiểu, khám phá tài nguyên du lịch hoặc kết hợp với mục đích hợp pháp khác.",
+    "expected_context": "Du lịch: các hoạt động có liên quan đến chuyến đi của con người ngoài nơi cư trú thường xuyên trong thời gian không quá 01 năm liên tục"
+  },
+  {
+    "question": "Điều kiện để công nhận khu du lịch quốc gia là gì?",
+    "expected_answer": "Có tài nguyên du lịch đặc biệt hấp dẫn, diện tích tối thiểu 1.000 ha (biển tối thiểu 200 ha), có kết cấu hạ tầng phục vụ du lịch và đón ít nhất 1.000.000 lượt khách mỗi năm.",
+    "expected_context": "Có diện tích tối thiểu 1.000 ha, riêng khu du lịch biển tối thiểu 200 ha bãi biển. Đón ít nhất 1.000.000 lượt khách du lịch mỗi năm."
+  },
+  {
+    "question": "Khách sạn 3 sao cần đáp ứng tiêu chuẩn tối thiểu gì về buồng ngủ?",
+    "expected_answer": "Khách sạn 3 sao phải có tối thiểu 25 buồng ngủ với diện tích phòng tiêu chuẩn tối thiểu là 22 m2.",
+    "expected_context": "Có tối thiểu 25 buồng ngủ. Diện tích phòng ngủ tiêu chuẩn tối thiểu 22 m²."
+  },
+  {
+    "question": "Tiền ký quỹ để kinh doanh lữ hành quốc tế đối với khách outbound là bao nhiêu?",
+    "expected_answer": "Tiền ký quỹ để kinh doanh lữ hành quốc tế đối với khách outbound là 500.000.000 đồng.",
+    "expected_context": "Kinh doanh lữ hành quốc tế đối với khách outbound: 500.000.000 đồng."
+  },
+  {
+    "question": "Điều kiện học vấn tối thiểu để được cấp thẻ hướng dẫn viên du lịch nội địa?",
+    "expected_answer": "Có bằng tốt nghiệp trung cấp trở lên chuyên ngành hướng dẫn du lịch, hoặc bằng tốt nghiệp đại học/cao đẳng chuyên ngành khác kèm chứng chỉ nghiệp vụ.",
+    "expected_context": "Có bằng tốt nghiệp trung cấp trở lên chuyên ngành hướng dẫn du lịch"
+  },
+  {
+    "question": "Thẻ hướng dẫn viên du lịch có thời hạn hiệu lực bao lâu?",
+    "expected_answer": "Thẻ hướng dẫn viên du lịch có hiệu lực 05 năm.",
+    "expected_context": "Điều 7. Thời hạn thẻ hướng dẫn viên. Thẻ hướng dẫn viên du lịch có hiệu lực 05 năm."
+  },
+  {
+    "question": "Hướng dẫn viên du lịch quốc tế cần đáp ứng yêu cầu gì về ngôn ngữ?",
+    "expected_answer": "Phải sử dụng thành thạo ngoại ngữ đăng ký hành nghề.",
+    "expected_context": "Sử dụng thành thạo ngoại ngữ đăng ký hành nghề."
+  },
+  {
+    "question": "Du lịch sinh thái là gì?",
+    "expected_answer": "Là loại hình du lịch dựa trên giá trị của hệ sinh thái tự nhiên, góp phần bảo tồn đa dạng sinh học và nâng cao nhận thức của cộng đồng.",
+    "expected_context": "Du lịch sinh thái được phát triển dựa trên giá trị của hệ sinh thái tự nhiên, góp phần bảo tồn đa dạng sinh học"
+  },
+  {
+    "question": "Theo luật, hướng dẫn viên du lịch có quyền từ chối khách không?",
+    "expected_answer": "Hướng dẫn viên có quyền từ chối thực hiện những yêu cầu trái với quy định của pháp luật.",
+    "expected_context": "Từ chối thực hiện những yêu cầu trái với quy định pháp luật."
+  },
+  {
+    "question": "Kinh doanh lữ hành nội địa cần ký quỹ bao nhiêu?",
+    "expected_answer": "Cần ký quỹ 100.000.000 đồng.",
+    "expected_context": "Kinh doanh lữ hành nội địa: 100.000.000 đồng."
+  },
+  {
+    "question": "Cửa khẩu quốc tế đường bộ Mộc Bài nằm ở tỉnh nào?",
+    "expected_answer": "Cửa khẩu quốc tế Mộc Bài nằm ở tỉnh Tây Ninh.",
+    "expected_context": "Đường bộ (chọn lọc): Mộc Bài (Tây Ninh — Campuchia)"
+  }
+]
