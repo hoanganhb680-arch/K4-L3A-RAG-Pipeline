@@ -5,44 +5,96 @@ Dùng cùng corpus chunks với Task 5. BM25 phù hợp với từ khóa chính 
 liệu và tên riêng. Output phải theo SearchResult và sort score giảm dần.
 """
 
+from .contracts import validate_search_results
+from .task4_chunking_indexing import get_collection
+
 
 CORPUS: list[dict] = []
+BM25_INDEX = None
+
+
+def _load_corpus_from_chroma():
+    """Tải toàn bộ chunks từ ChromaDB để làm corpus cho BM25."""
+    global CORPUS
+    if CORPUS:
+        return
+        
+    try:
+        collection = get_collection()
+        response = collection.get(include=["documents", "metadatas"])
+        
+        if not response or not response["ids"]:
+            print("Warning: ChromaDB is empty. Run task 4 first.")
+            return
+            
+        for i in range(len(response["ids"])):
+            metadata = response["metadatas"][i]
+            if "url" in metadata and metadata["url"] == "":
+                metadata["url"] = None
+                
+            CORPUS.append({
+                "id": response["ids"][i],
+                "content": response["documents"][i],
+                "metadata": metadata,
+            })
+    except Exception as e:
+        print(f"Error loading corpus from Chroma: {e}")
 
 
 def build_bm25_index(corpus: list[dict]):
     """Tạo BM25 index từ cùng corpus chunks của Task 4."""
-    # TODO: Tokenize và tạo BM25 index.
-    #
-    # from rank_bm25 import BM25Okapi
-    # tokenized = [item["content"].lower().split() for item in corpus]
-    # return BM25Okapi(tokenized)
-    raise NotImplementedError("Implement build_bm25_index")
+    from rank_bm25 import BM25Okapi  # type: ignore[import-untyped]
+    
+    if not corpus:
+        return None
+        
+    # Tiền xử lý văn bản: chuyển thành chữ thường và tách từ cơ bản
+    tokenized = [item["content"].lower().split() for item in corpus]
+    return BM25Okapi(tokenized)
 
 
 def lexical_search(query: str, top_k: int = 10) -> list[dict]:
     """Trả về BM25 SearchResult theo score giảm dần."""
-    # TODO: Tính BM25 scores và map lại corpus.
-    #
-    # import numpy as np
-    # bm25 = build_bm25_index(CORPUS)
-    # scores = bm25.get_scores(query.lower().split())
-    # indices = np.argsort(scores)[::-1][:top_k]
-    # results = []
-    # for index in indices:
-    #     if scores[index] <= 0:
-    #         continue
-    #     item = CORPUS[index]
-    #     results.append({
-    #         "id": item["id"],
-    #         "content": item["content"],
-    #         "score": float(scores[index]),
-    #         "metadata": item["metadata"],
-    #         "retrieval_method": "bm25",
-    #     })
-    # return results
-    raise NotImplementedError("Implement lexical_search")
+    import numpy as np
+    global BM25_INDEX
+    
+    _load_corpus_from_chroma()
+    
+    if not CORPUS:
+        return []
+        
+    if BM25_INDEX is None:
+        BM25_INDEX = build_bm25_index(CORPUS)
+        
+    if BM25_INDEX is None:
+        return []
+
+    # Tiền xử lý query
+    tokenized_query = query.lower().split()
+    scores = BM25_INDEX.get_scores(tokenized_query)
+    
+    # Lấy top_k kết quả tốt nhất
+    indices = np.argsort(scores)[::-1][:top_k]
+    
+    results = []
+    for index in indices:
+        if scores[index] <= 0:
+            continue
+            
+        item = CORPUS[index]
+        results.append({
+            "id": item["id"],
+            "content": item["content"],
+            "score": float(scores[index]),
+            "metadata": item["metadata"],
+            "retrieval_method": "bm25",
+        })
+        
+    # Validate kết quả
+    validate_search_results(results, expected_method="bm25")
+    return results
 
 
 if __name__ == "__main__":
-    for result in lexical_search("test query", top_k=3):
-        print(result)
+    for result in lexical_search("visa việt nam", top_k=3):
+        print(f"Score: {result['score']:.4f} | {result['metadata']['title']} | ID: {result['id']}")

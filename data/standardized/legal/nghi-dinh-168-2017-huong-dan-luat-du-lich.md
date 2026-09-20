@@ -1,0 +1,53 @@
+---
+source: nghi-dinh-168-2017-huong-dan-luat-du-lich.txt
+title: Nghi Dinh 168 2017 Huong Dan Luat Du Lich
+doc_type: legal
+---
+
+# Nghị định 168/2017/NĐ-CP hướng dẫn Luật Du lịch
+
+Nguồn: https://thuvienphapluat.vn/van-ban/van-hoa-xa-hoi/Nghi-dinh-168-2017-ND-CP-huong-dan-Luat-Du-lich-368340.aspx
+Ngày ban hành: 31/12/2017 | Hiệu lực: 01/01/2018
+
+## Chương I — Quy định chung
+
+### Điều 1. Phạm vi điều chỉnh
+Nghị định này quy định chi tiết một số điều và biện pháp thi hành Luật Du lịch.
+
+## Chương II — Lưu trú du lịch
+
+### Điều 7. Xếp hạng cơ sở lưu trú du lịch
+Cơ sở lưu trú du lịch được xếp hạng từ 1 đến 5 sao:
+- **1 sao**: cơ sở vật chất tối thiểu, phục vụ cơ bản.
+- **2 sao**: tiện nghi khá, có phòng ăn sáng.
+- **3 sao**: tiện nghi tốt, đa dạng dịch vụ.
+- **4 sao**: tiện nghi cao cấp, dịch vụ phong phú.
+- **5 sao**: tiện nghi sang trọng, dịch vụ đẳng cấp quốc tế.
+
+### Điều 9. Tiêu chuẩn khách sạn 3 sao
+- Có tối thiểu 25 buồng ngủ.
+- Diện tích phòng ngủ tiêu chuẩn tối thiểu 22 m².
+- Có nhà hàng phục vụ ăn uống.
+- Có bộ phận tiếp tân 24/24 giờ.
+- Nhân viên phục vụ thành thạo tiếng Anh.
+
+## Chương III — Lữ hành
+
+### Điều 14. Tiền ký quỹ kinh doanh lữ hành
+- Kinh doanh lữ hành nội địa: 100.000.000 đồng.
+- Kinh doanh lữ hành quốc tế đối với khách inbound: 250.000.000 đồng.
+- Kinh doanh lữ hành quốc tế đối với khách outbound: 500.000.000 đồng.
+
+### Điều 16. Hướng dẫn viên du lịch
+Hướng dẫn viên du lịch phải có:
+- Thẻ hướng dẫn viên còn hiệu lực.
+- Trình độ đại học hoặc cao đẳng chuyên ngành du lịch.
+- Chứng chỉ nghiệp vụ hướng dẫn viên.
+
+## Chương V — Xúc tiến du lịch
+
+### Điều 36. Quỹ hỗ trợ phát triển du lịch
+Quỹ hỗ trợ phát triển du lịch được hình thành từ:
+- Ngân sách nhà nước.
+- Đóng góp của các tổ chức, cá nhân kinh doanh du lịch.
+- Tài trợ của tổ chức, cá nhân trong và ngoài nước.
